@@ -52,3 +52,19 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:unialgo
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Trigger UniAlgo Dokploy redeploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_COMPOSE_ID: ${{ secrets.UNIALGO_DOKPLOY_COMPOSE_ID }}
+        run: |
+          test -n "$DOKPLOY_URL"
+          test -n "$DOKPLOY_API_KEY"
+          test -n "$DOKPLOY_COMPOSE_ID"
+          npx -y @dokploy/cli compose deploy \
+            --composeId "$DOKPLOY_COMPOSE_ID" \
+            --title "Deploy custom Chatwoot image" \
+            --description "Image: $IMAGE_NAME:$GITHUB_SHA" \
+            --json
