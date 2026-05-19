@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - develop
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
 
 permissions:
   contents: read
@@ -49,6 +52,8 @@ jobs:
           file: docker/Dockerfile
           push: true
           platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ env.IMAGE_NAME }}:unialgo
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
